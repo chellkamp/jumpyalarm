@@ -1,0 +1,8 @@
+CREATE TABLE ALARM
+(
+    _ID INTEGER PRIMARY KEY,
+    FIRST_ALARM_DATETIME TEXT NOT NULL, // date/time of first scheduled alarm, in yyyy-DD HH:mm (year-dayofyear 00to23hour:minute) format
+    REPEAT INTEGER NOT NULL, // 1 or 0 to represent true or false
+    DAYS_OF_WEEK INTEGER NOT NULL,  // bitmask:  0x1 is Sunday, 0x10 is Monday, etc, up through Saturday
+    LABEL TEXT NULL
+)

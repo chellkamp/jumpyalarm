@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">JumpyAlarm</string>
+    <string name="alarm_tab_title">Alarms</string>
+    <string name="timer_tab_title">Timers</string>
+    <string name="tbd_msg">This feature is TBD.</string>
+    <string name="alarm_placeholder">Alarm list will go here.</string>
+</resources>
