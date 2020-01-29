@@ -7,10 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import org.hellscode.jumpyalarm.R;
@@ -20,7 +18,6 @@ import org.hellscode.jumpyalarm.ui.model.AlarmListAdapter;
 import org.hellscode.util.ui.DialogUtil;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class AlarmListFragment extends Fragment {
 
@@ -30,6 +27,13 @@ public class AlarmListFragment extends Fragment {
     private ListView _listView;
     private AlarmListAdapter _listAdapter;
 
+    /**
+     * Called to create the view for the fragment
+     * @param inflater layout inflater
+     * @param container container to attach to
+     * @param savedInstanceState saved state
+     * @return view
+     */
     @Override
     public View onCreateView (LayoutInflater inflater,
                               ViewGroup container,

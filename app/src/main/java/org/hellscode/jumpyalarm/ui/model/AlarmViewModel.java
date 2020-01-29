@@ -3,8 +3,6 @@ package org.hellscode.jumpyalarm.ui.model;
 import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.Bindable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -12,9 +10,11 @@ import androidx.lifecycle.Observer;
 import org.hellscode.jumpyalarm.data.AlarmEntity;
 
 import java.util.Date;
-import java.util.Observable;
 
-public class AlarmViewModel extends Observable {
+/**
+ * View model for an alarm's settings
+ */
+public class AlarmViewModel {
 
     private LifecycleOwner _lifecycleOwner;
     private SQLiteDatabase _db;
@@ -26,6 +26,12 @@ public class AlarmViewModel extends Observable {
     private MutableLiveData<Byte> _daysOfWeek = new MutableLiveData<>();
     private MutableLiveData<String> _label = new MutableLiveData<>();
 
+    /**
+     * Constructor
+     * @param lifecycleOwner lifecycle owner for the live data members
+     * @param db database connection
+     * @param entity alarm database entity
+     */
     AlarmViewModel(
             @NonNull LifecycleOwner lifecycleOwner,
             @NonNull SQLiteDatabase db,
@@ -112,22 +118,42 @@ public class AlarmViewModel extends Observable {
 
     }
 
+    /**
+     * enabled property
+     * @return alarm enabled
+     */
     public MutableLiveData<Boolean> getEnabled() {
         return _enabled;
     }
 
+    /**
+     * firstAlarm property
+     * @return date/time of first scheduled alarm
+     */
     public MutableLiveData<Date> getFirstAlarm() {
         return _firstAlarm;
     }
 
+    /**
+     * repeat property
+     * @return whether alarm is repeating
+     */
     public MutableLiveData<Boolean> getRepeat() {
         return _repeat;
     }
 
+    /**
+     * daysOfWeek property
+     * @return days of week that alarm is valid
+     */
     public MutableLiveData<Byte> getDaysOfWeek() {
         return _daysOfWeek;
     }
 
+    /**
+     * label property
+     * @return label for alarm
+     */
     public MutableLiveData<String> getLabel() {
         return _label;
     }
@@ -143,6 +169,4 @@ public class AlarmViewModel extends Observable {
         );
         t.start();
     }
-
-
 }

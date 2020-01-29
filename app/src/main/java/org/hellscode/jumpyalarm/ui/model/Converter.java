@@ -4,15 +4,23 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * Container for binding converter methods
+ */
 public class Converter {
 
     private static String _timeOnlyFormat = "hh:mm aa";
 
-    public static String dateToTimeString(Date newVal) {
+    /**
+     * Convert a Date object to a simple time string for display
+     * @param val source value
+     * @return time string
+     */
+    public static String dateToTimeString(Date val) {
         String retVal = "";
 
-        if (newVal != null) {
-            retVal = new SimpleDateFormat(_timeOnlyFormat, Locale.US).format(newVal);
+        if (val != null) {
+            retVal = new SimpleDateFormat(_timeOnlyFormat, Locale.US).format(val);
         }
 
         return retVal;

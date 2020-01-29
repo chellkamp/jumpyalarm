@@ -7,7 +7,6 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.res.Resources;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import com.google.android.material.tabs.TabLayout;
@@ -15,10 +14,12 @@ import com.google.android.material.tabs.TabLayout;
 import org.hellscode.jumpyalarm.data.DatabaseHelper;
 import org.hellscode.jumpyalarm.ui.view.AlarmListFragment;
 import org.hellscode.jumpyalarm.ui.view.TimerListFragment;
-import org.hellscode.util.ui.DialogUtil;
 import org.hellscode.util.ui.model.TabConfigInfo;
 import org.hellscode.util.ui.view.TabLayoutUtil;
 
+/**
+ * Main display activity
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override

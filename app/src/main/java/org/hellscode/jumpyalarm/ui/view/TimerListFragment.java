@@ -9,6 +9,9 @@ import androidx.fragment.app.Fragment;
 
 import org.hellscode.jumpyalarm.R;
 
+/**
+ * Holds a list of timers.  This is just a placeholder at this point.
+ */
 public class TimerListFragment extends Fragment {
     @Override
     public View onCreateView (LayoutInflater inflater,

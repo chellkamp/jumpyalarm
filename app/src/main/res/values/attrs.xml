@@ -1,6 +1,4 @@
 <resources>
     <declare-styleable name="AlarmView">
-        <attr name="date" format="string" />
-        <attr name="switchEnabled" format="boolean"/>
     </declare-styleable>
 </resources>

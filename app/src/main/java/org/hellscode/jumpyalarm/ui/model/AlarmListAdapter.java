@@ -21,12 +21,21 @@ public class AlarmListAdapter extends BaseAdapter {
     private final Object _itemLock = new Object();
     private ArrayList<AlarmEntity> _items = new ArrayList<>();
 
+    /**
+     * Constructor
+     * @param lifecycleOwner lifecycle owner to use when creating LiveData
+     * @param db database connection
+     */
     public AlarmListAdapter(LifecycleOwner lifecycleOwner, SQLiteDatabase db) {
         super();
         _lifecycleOwner = lifecycleOwner;
         _db = db;
     }
 
+    /**
+     * Get underlying items
+     * @return list of items
+     */
     public ArrayList<AlarmEntity> getItems()
     {
         ArrayList<AlarmEntity> itemListCopy;
@@ -38,6 +47,10 @@ public class AlarmListAdapter extends BaseAdapter {
         return itemListCopy;
     }
 
+    /**
+     * set the item list
+     * @param items items
+     */
     public void setItems(@NonNull ArrayList<AlarmEntity> items) {
         synchronized (_itemLock) {
             _items.clear();
@@ -46,6 +59,10 @@ public class AlarmListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    /**
+     * Get number of items in list.
+     * @return item count
+     */
     @Override
     public int getCount() {
         int count;
@@ -55,6 +72,11 @@ public class AlarmListAdapter extends BaseAdapter {
         return count;
     }
 
+    /**
+     * Get the item at the specified position.
+     * @param position index
+     * @return item
+     */
     @Override
     public Object getItem(int position) {
         AlarmEntity entry = null;
@@ -68,6 +90,11 @@ public class AlarmListAdapter extends BaseAdapter {
         return entry;
     }
 
+    /**
+     * Gets a unique ID for an item
+     * @param position index of the item
+     * @return ID number
+     */
     @Override
     public long getItemId(int position) {
         long retVal = -1;
@@ -81,6 +108,13 @@ public class AlarmListAdapter extends BaseAdapter {
         return retVal;
     }
 
+    /**
+     * Get a view for the item at a specific position
+     * @param position index of item
+     * @param convertView cached old view
+     * @param viewGroup group to attach new view to
+     * @return view
+     */
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup viewGroup) {
 
