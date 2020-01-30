@@ -71,6 +71,7 @@ public class AlarmView extends LinearLayout {
      */
     public void setViewModel(AlarmViewModel viewModel) {
         _binding.setViewModel(viewModel);
+        _binding.setLifecycleOwner(viewModel.getLifecycleOwner());
         _binding.invalidateAll();
     }
 

@@ -19,7 +19,7 @@ public class AlarmEntity {
 
     private static class Columns implements BaseColumns {
         static final String Enabled = "Enabled";
-        static final String FirstAlarm = "FirstAlarm";
+        static final String OnOrAfter = "OnOrAfter";
         static final String Repeat = "Repeat";
         static final String DaysOfWeek = "DaysOfWeek";
         static final String Label = "Label";
@@ -30,7 +30,7 @@ public class AlarmEntity {
 
     private long _field__id = -1;
     private boolean _field_Enabled = true;
-    private Date _field_FirstAlarm;
+    private Date _field_OnOrAfter;
     private boolean _field_Repeat;
     private byte _field_DaysOfWeek = 0b0111110;
     private String _field_Label;
@@ -40,14 +40,17 @@ public class AlarmEntity {
      */
     public AlarmEntity() {
         Calendar c = Calendar.getInstance();
-        _field_FirstAlarm = c.getTime();
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MINUTE, 0);
+
+        _field_OnOrAfter = c.getTime();
     }
 
     static final String createStatement =
             "CREATE TABLE \"" + _table + "\" (\n" +
             "  \"" + Columns._ID +  "\" INTEGER PRIMARY KEY,\n" +
             "  \"" + Columns.Enabled + "\" INTEGER NOT NULL,\n" +
-            "  \"" + Columns.FirstAlarm + "\" INTEGER NOT NULL,\n" +
+            "  \"" + Columns.OnOrAfter + "\" INTEGER NOT NULL,\n" +
             "  \"" + Columns.Repeat + "\" INTEGER NOT NULL,\n" +
             "  \"" + Columns.DaysOfWeek + "\" INTEGER NOT NULL,\n" +
             "  \"" + Columns.Label + "\" TEXT NULL\n" +
@@ -59,9 +62,9 @@ public class AlarmEntity {
     public boolean getEnabled() { return _field_Enabled; }
     public void setEnabled(boolean enabled) { _field_Enabled = enabled; }
 
-    public Date getFirstAlarm() { return _field_FirstAlarm; }
-    public void setFirstAlarm(Date firstAlarm){
-        _field_FirstAlarm = firstAlarm;
+    public Date getOnOrAfter() { return _field_OnOrAfter; }
+    public void setOnOrAfter(Date firstAlarm){
+        _field_OnOrAfter = firstAlarm;
     }
 
     public boolean getRepeat() { return _field_Repeat; }
@@ -98,7 +101,7 @@ public class AlarmEntity {
 
         //assemble all non-id values
         retVal.put(Columns.Enabled, _field_Enabled);
-        retVal.put(Columns.FirstAlarm, getNonNullDBValue(_field_FirstAlarm));
+        retVal.put(Columns.OnOrAfter, getNonNullDBValue(_field_OnOrAfter));
         retVal.put(Columns.Repeat, _field_Repeat);
         retVal.put(Columns.DaysOfWeek, _field_DaysOfWeek);
         retVal.put(Columns.Label, _field_Label);
@@ -186,7 +189,7 @@ public class AlarmEntity {
     private void loadFromCursor(@NonNull Cursor cursor) {
         _field__id = cursor.getLong(cursor.getColumnIndex(Columns._ID));
         _field_Enabled = getBooleanFromDBValue(cursor.getInt(cursor.getColumnIndex(Columns.Enabled)));
-        _field_FirstAlarm = getDateFromDBValue(cursor.getLong(cursor.getColumnIndex(Columns.FirstAlarm)));
+        _field_OnOrAfter = getDateFromDBValue(cursor.getLong(cursor.getColumnIndex(Columns.OnOrAfter)));
         _field_Repeat = getBooleanFromDBValue(cursor.getInt(cursor.getColumnIndex(Columns.Repeat)));
         _field_DaysOfWeek = getByteFromDBValue(cursor.getInt(cursor.getColumnIndex(Columns.DaysOfWeek)));
         _field_Label = cursor.getString(cursor.getColumnIndex(Columns.Label));

@@ -42,7 +42,7 @@ public class ExampleInstrumentedTest {
         db.execSQL("DELETE FROM \"Alarm\"");
 
         Calendar c = Calendar.getInstance();
-        c.add(Calendar.DATE, 1);
+        c.add(Calendar.DATE, 10);
         c.set(Calendar.HOUR_OF_DAY, 6);
         c.set(Calendar.MINUTE, 30);
         c.set(Calendar.SECOND, 0);
@@ -50,7 +50,7 @@ public class ExampleInstrumentedTest {
 
         for (int i = 0; i < 3; ++i) {
             AlarmEntity entity = new AlarmEntity();
-            entity.setFirstAlarm(c.getTime());
+            entity.setOnOrAfter(c.getTime());
             entity.setRepeat(true);
             entity.setDaysOfWeek((byte)0b10); // Monday only
             entity.setLabel(String.format("test alarm %d", i+1));
@@ -76,10 +76,20 @@ public class ExampleInstrumentedTest {
         for(AlarmEntity e : entities) {
             System.out.println();
             System.out.println(e.getLabel());
-            System.out.println(e.getFirstAlarm());
+            System.out.println(e.getOnOrAfter());
             System.out.println(e.getRepeat());
             System.out.println(e.getDaysOfWeek());
         }
 
     }
+
+    @Test
+    public void dropAlarmTable() {
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        DatabaseHelper dbHelper = new DatabaseHelper(appContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.execSQL("DROP TABLE \"Alarm\"");
+
+    }
+
 }

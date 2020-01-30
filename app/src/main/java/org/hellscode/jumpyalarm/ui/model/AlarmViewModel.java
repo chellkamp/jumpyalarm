@@ -21,7 +21,7 @@ public class AlarmViewModel {
     private AlarmEntity _entity;
 
     private MutableLiveData<Boolean> _enabled = new MutableLiveData<>();
-    private MutableLiveData<Date> _firstAlarm = new MutableLiveData<>();
+    private MutableLiveData<Date> _onOrAfter = new MutableLiveData<>();
     private MutableLiveData<Boolean> _repeat = new MutableLiveData<>();
     private MutableLiveData<Byte> _daysOfWeek = new MutableLiveData<>();
     private MutableLiveData<String> _label = new MutableLiveData<>();
@@ -56,14 +56,14 @@ public class AlarmViewModel {
                     }
                 });
 
-        _firstAlarm.setValue(_entity.getFirstAlarm());
-        _firstAlarm.observe(_lifecycleOwner,
+        _onOrAfter.setValue(_entity.getOnOrAfter());
+        _onOrAfter.observe(_lifecycleOwner,
                 new Observer<Date>() {
                     @Override
                     public void onChanged(Date date) {
-                        Date oldVal = _entity.getFirstAlarm();
+                        Date oldVal = _entity.getOnOrAfter();
                         if (!oldVal.equals(date)) {
-                            _entity.setFirstAlarm(date);
+                            _entity.setOnOrAfter(date);
                             saveToDB();
                         }
                     }
@@ -118,6 +118,8 @@ public class AlarmViewModel {
 
     }
 
+    public LifecycleOwner getLifecycleOwner() { return _lifecycleOwner;}
+
     /**
      * enabled property
      * @return alarm enabled
@@ -127,11 +129,11 @@ public class AlarmViewModel {
     }
 
     /**
-     * firstAlarm property
-     * @return date/time of first scheduled alarm
+     * "on or after" property
+     * @return date/time combo of alarm time and "no earlier than" date to start alarm
      */
-    public MutableLiveData<Date> getFirstAlarm() {
-        return _firstAlarm;
+    public MutableLiveData<Date> getOnOrAfter() {
+        return _onOrAfter;
     }
 
     /**
