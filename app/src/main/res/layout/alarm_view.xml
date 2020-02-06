@@ -20,14 +20,18 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="10dp"
                 android:layout_marginLeft="10dp">
+
                 <TextView
                     android:id="@+id/alarmTimeText"
                     android:layout_width="250dp"
                     android:layout_height="wrap_content"
-                    android:textSize="50sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="@{() -> viewModel.runUserSelectTimeAction()}"
+                    android:enabled="@{viewModel.enabled}"
                     android:gravity="center_vertical"
                     android:text="@{Converter.dateToTimeString(viewModel.onOrAfter)}"
-                    android:enabled="@{viewModel.enabled}"/>
+                    android:textSize="50sp" />
                 <TextView
                     android:id="@+id/alarmDateText"
                     android:layout_width="250dp"

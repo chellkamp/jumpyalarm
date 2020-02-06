@@ -11,6 +11,7 @@ import org.hellscode.util.ui.model.TabConfigInfo;
 class FragmentConfigPagerAdapter extends FragmentPagerAdapter {
 
     private TabConfigInfo[] _config;
+    private Fragment[] _fragments;
 
     /**
      * Constructor
@@ -24,18 +25,33 @@ class FragmentConfigPagerAdapter extends FragmentPagerAdapter {
             @NonNull TabConfigInfo[] config) {
         super(fm, behavior);
         _config = config;
+
+        // build fragment list
+        _fragments = new Fragment[_config.length];
+        for(int i = 0; i < _config.length; ++i) {
+            _fragments[i] = _config[i].getFragmentCreator().create();
+        }
     }
 
+    /**
+     * Get the page title for a given position
+     * @param position item index
+     * @return title or null
+     */
     public CharSequence getPageTitle (int position) {
         return _config[position].getTabName();
     }
 
+    /**
+     * Get the fragment for a given position
+     * @param position item index
+     * @return fragment
+     */
     @Override
     public @NonNull Fragment getItem(int position) {
-        return _config[position].getFragmentCreator().create();
+        return _fragments[position];
     }
 
     @Override
-    public int getCount() { return _config.length; }
-
+    public int getCount() { return _fragments.length; }
 }

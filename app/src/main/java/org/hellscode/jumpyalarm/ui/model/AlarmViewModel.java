@@ -3,9 +3,11 @@ package org.hellscode.jumpyalarm.ui.model;
 import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+import androidx.databinding.library.baseAdapters.BR;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import org.hellscode.jumpyalarm.data.AlarmEntity;
 
@@ -14,17 +16,14 @@ import java.util.Date;
 /**
  * View model for an alarm's settings
  */
-public class AlarmViewModel {
+public class AlarmViewModel extends BaseObservable {
 
     private LifecycleOwner _lifecycleOwner;
     private SQLiteDatabase _db;
     private AlarmEntity _entity;
 
-    private MutableLiveData<Boolean> _enabled = new MutableLiveData<>();
-    private MutableLiveData<Date> _onOrAfter = new MutableLiveData<>();
-    private MutableLiveData<Boolean> _repeat = new MutableLiveData<>();
-    private MutableLiveData<Byte> _daysOfWeek = new MutableLiveData<>();
-    private MutableLiveData<String> _label = new MutableLiveData<>();
+    private Runnable _userSelectTimeAction;
+    private final Object _userSelectTimeActionLock = new Object();
 
     /**
      * Constructor
@@ -32,132 +31,132 @@ public class AlarmViewModel {
      * @param db database connection
      * @param entity alarm database entity
      */
-    AlarmViewModel(
+    public AlarmViewModel(
             @NonNull LifecycleOwner lifecycleOwner,
             @NonNull SQLiteDatabase db,
             @NonNull AlarmEntity entity) {
         _lifecycleOwner = lifecycleOwner;
         _db = db;
         _entity = entity;
-
-        // tie members to entity
-        _enabled.setValue(_entity.getEnabled());
-        _enabled.observe(_lifecycleOwner,
-                new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean aBoolean) {
-                        boolean oldVal = _entity.getEnabled();
-                        if (oldVal != aBoolean) {
-                            _entity.setEnabled(aBoolean);
-
-                            saveToDB();
-                        }
-
-                    }
-                });
-
-        _onOrAfter.setValue(_entity.getOnOrAfter());
-        _onOrAfter.observe(_lifecycleOwner,
-                new Observer<Date>() {
-                    @Override
-                    public void onChanged(Date date) {
-                        Date oldVal = _entity.getOnOrAfter();
-                        if (!oldVal.equals(date)) {
-                            _entity.setOnOrAfter(date);
-                            saveToDB();
-                        }
-                    }
-                });
-
-        _repeat.setValue(_entity.getRepeat());
-        _repeat.observe(_lifecycleOwner,
-                new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean aBoolean) {
-                        boolean oldVal = _entity.getRepeat();
-                        if (oldVal != aBoolean) {
-                            _entity.setRepeat(aBoolean);
-                            saveToDB();
-                        }
-                    }
-                });
-
-        _daysOfWeek.setValue(_entity.getDaysOfWeek());
-        _daysOfWeek.observe(_lifecycleOwner,
-                new Observer<Byte>() {
-                    @Override
-                    public void onChanged(Byte aByte) {
-                        byte oldVal = _entity.getDaysOfWeek();
-                        if (oldVal != aByte) {
-                            _entity.setDaysOfWeek(aByte);
-                            saveToDB();
-                        }
-                    }
-                });
-
-        _label.setValue(_entity.getLabel());
-        _label.observe(_lifecycleOwner,
-                new Observer<String>() {
-                    @Override
-                    public void onChanged(String s) {
-                        String oldVal = _entity.getLabel();
-                        boolean changed = true;
-                        if (oldVal != null && s != null) {
-                            if (oldVal.equals(s)) {
-                                changed = false;
-                            }
-                        } else if (oldVal == null && s == null) {
-                            changed = false;
-                        }
-                        if (changed) {
-                            _entity.setLabel(s);
-                            saveToDB();
-                        }
-                    }
-                });
-
     }
 
     public LifecycleOwner getLifecycleOwner() { return _lifecycleOwner;}
 
     /**
+     * ID property.  Read-only.
+     * @return ID of entry
+     */
+    @Bindable
+    public long getID() { return _entity.get_id(); }
+
+    /**
      * enabled property
      * @return alarm enabled
      */
-    public MutableLiveData<Boolean> getEnabled() {
-        return _enabled;
+    @Bindable
+    public synchronized boolean getEnabled() {
+        return _entity.getEnabled();
+    }
+
+    public synchronized void setEnabled(boolean enabled) {
+        boolean oldVal = _entity.getEnabled();
+        if (oldVal != enabled) {
+            _entity.setEnabled(enabled);
+            notifyPropertyChanged(BR.enabled);
+            saveToDB();
+        }
     }
 
     /**
      * "on or after" property
      * @return date/time combo of alarm time and "no earlier than" date to start alarm
      */
-    public MutableLiveData<Date> getOnOrAfter() {
-        return _onOrAfter;
+    @Bindable
+    public synchronized Date getOnOrAfter() { return _entity.getOnOrAfter(); }
+
+    public synchronized void setOnOrAfter(Date onOrAfter) {
+        Date oldVal = _entity.getOnOrAfter();
+        if (!oldVal.equals(onOrAfter)) {
+            _entity.setOnOrAfter(onOrAfter);
+            notifyPropertyChanged(BR.onOrAfter);
+            saveToDB();
+        }
     }
 
     /**
      * repeat property
      * @return whether alarm is repeating
      */
-    public MutableLiveData<Boolean> getRepeat() {
-        return _repeat;
+    @Bindable
+    public synchronized boolean getRepeat() {
+        return _entity.getRepeat();
+    }
+
+    public synchronized void setRepeat(boolean repeat) {
+        boolean oldVal = _entity.getRepeat();
+        if (oldVal != repeat) {
+            _entity.setRepeat(repeat);
+            notifyPropertyChanged(BR.repeat);
+            saveToDB();
+        }
     }
 
     /**
      * daysOfWeek property
      * @return days of week that alarm is valid
      */
-    public MutableLiveData<Byte> getDaysOfWeek() {
-        return _daysOfWeek;
+    @Bindable
+    public synchronized byte getDaysOfWeek() { return _entity.getDaysOfWeek(); }
+
+    public synchronized void setDaysOfWeek(byte days) {
+        byte oldVal = _entity.getDaysOfWeek();
+        if (oldVal != days) {
+            _entity.setDaysOfWeek(days);
+            notifyPropertyChanged(BR.daysOfWeek);
+            saveToDB();
+        }
     }
 
     /**
      * label property
      * @return label for alarm
      */
-    public MutableLiveData<String> getLabel() {
-        return _label;
+    @Bindable
+    public synchronized String getLabel() {
+        return _entity.getLabel();
+    }
+
+    public synchronized void setLabel(String label) {
+        String oldVal = _entity.getLabel();
+        boolean changed = true;
+        if (oldVal != null && label != null) {
+            if (oldVal.equals(label)) {
+                changed = false;
+            }
+        } else if (oldVal == null && label == null) {
+            changed = false;
+        }
+        if (changed) {
+            _entity.setLabel(label);
+            notifyPropertyChanged(BR.label);
+            saveToDB();
+        }
+    }
+
+    public void runUserSelectTimeAction() {
+        synchronized (_userSelectTimeActionLock) {
+            if (_userSelectTimeAction != null) {
+                _userSelectTimeAction.run();
+            }
+        }
+    }
+
+    public synchronized void setUserSelectTimeAction(Runnable action) {
+        synchronized (_userSelectTimeActionLock) {
+            if (_userSelectTimeAction != action) {
+                _userSelectTimeAction = action;
+            }
+        }
     }
 
     private void saveToDB() {

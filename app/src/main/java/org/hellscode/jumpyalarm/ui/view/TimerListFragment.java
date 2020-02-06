@@ -17,6 +17,7 @@ public class TimerListFragment extends Fragment {
     public View onCreateView (LayoutInflater inflater,
                               ViewGroup container,
                               Bundle savedInstanceState) {
+
         return inflater.inflate(R.layout.timer_tab, container, false);
     }
 }

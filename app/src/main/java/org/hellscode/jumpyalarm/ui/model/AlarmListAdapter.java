@@ -7,9 +7,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 
-import org.hellscode.jumpyalarm.data.AlarmEntity;
 import org.hellscode.jumpyalarm.ui.view.AlarmView;
 
 import java.util.ArrayList;
@@ -19,14 +19,16 @@ public class AlarmListAdapter extends BaseAdapter {
     private LifecycleOwner _lifecycleOwner;
     private SQLiteDatabase _db;
     private final Object _itemLock = new Object();
-    private ArrayList<AlarmEntity> _items = new ArrayList<>();
+    private ArrayList<AlarmViewModel> _items = new ArrayList<>();
 
     /**
      * Constructor
      * @param lifecycleOwner lifecycle owner to use when creating LiveData
      * @param db database connection
      */
-    public AlarmListAdapter(LifecycleOwner lifecycleOwner, SQLiteDatabase db) {
+    public AlarmListAdapter(
+            @NonNull LifecycleOwner lifecycleOwner,
+            @NonNull SQLiteDatabase db) {
         super();
         _lifecycleOwner = lifecycleOwner;
         _db = db;
@@ -36,9 +38,9 @@ public class AlarmListAdapter extends BaseAdapter {
      * Get underlying items
      * @return list of items
      */
-    public ArrayList<AlarmEntity> getItems()
+    public ArrayList<AlarmViewModel> getItems()
     {
-        ArrayList<AlarmEntity> itemListCopy;
+        ArrayList<AlarmViewModel> itemListCopy;
 
         synchronized (_itemLock) {
             itemListCopy = new ArrayList<>(_items);
@@ -51,7 +53,7 @@ public class AlarmListAdapter extends BaseAdapter {
      * set the item list
      * @param items items
      */
-    public void setItems(@NonNull ArrayList<AlarmEntity> items) {
+    public void setItems(@NonNull ArrayList<AlarmViewModel> items) {
         synchronized (_itemLock) {
             _items.clear();
             _items.addAll(items);
@@ -79,7 +81,7 @@ public class AlarmListAdapter extends BaseAdapter {
      */
     @Override
     public Object getItem(int position) {
-        AlarmEntity entry = null;
+        AlarmViewModel entry = null;
 
         synchronized (_itemLock) {
             if (position >= 0 && position < _items.size()) {
@@ -101,7 +103,7 @@ public class AlarmListAdapter extends BaseAdapter {
 
         synchronized (_itemLock) {
             if (position >= 0 && position < _items.size()) {
-                retVal = _items.get(position).get_id();
+                retVal = _items.get(position).getID();
             }
         }
 
@@ -121,14 +123,13 @@ public class AlarmListAdapter extends BaseAdapter {
         Context c = viewGroup.getContext();
         AlarmView retVal = new AlarmView(c);
 
-
         synchronized (_itemLock) {
             if (position >= 0 && position < _items.size()) {
-                AlarmEntity item = _items.get(position);
-                AlarmViewModel vm = new AlarmViewModel(_lifecycleOwner, _db, item);
-                retVal.setViewModel(vm);
+                AlarmViewModel item = _items.get(position);
+                retVal.setViewModel(item);
             }
         }
         return retVal;
     }
+
 }

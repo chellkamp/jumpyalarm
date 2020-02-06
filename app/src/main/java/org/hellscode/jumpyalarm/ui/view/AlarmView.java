@@ -15,7 +15,7 @@ import org.hellscode.jumpyalarm.R;
 import org.hellscode.jumpyalarm.databinding.AlarmViewBinding;
 import org.hellscode.jumpyalarm.ui.model.AlarmViewModel;
 
-/**
+/**d
  * AlarmView compound control
  */
 public class AlarmView extends LinearLayout {
