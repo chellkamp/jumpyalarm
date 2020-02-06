@@ -1,5 +1,7 @@
 package org.hellscode.jumpyalarm.ui.model;
 
+import android.view.View;
+
 import org.hellscode.jumpyalarm.util.AlarmUtil;
 
 import java.text.SimpleDateFormat;
@@ -51,5 +53,14 @@ public class Converter {
         }
 
         return retVal;
+    }
+
+    /**
+     * Convert a boolean to a visibility status
+     * @param show true for show; false for hide
+     * @return View.VISIBLE or View.GONE
+     */
+    public static int showToVisibility(boolean show) {
+        return show ? View.VISIBLE : View.GONE;
     }
 }

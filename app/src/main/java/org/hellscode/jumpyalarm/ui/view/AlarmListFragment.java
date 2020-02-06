@@ -108,6 +108,14 @@ public class AlarmListFragment extends Fragment
                             };
 
                             vm.setUserSelectTimeAction(timeAction);
+                            vm.setOnShowDetailsChanged(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            onShowDetailsChange(vm);
+                                        }
+                                    }
+                            );
 
                             data.add(vm);
                         }
@@ -136,6 +144,17 @@ public class AlarmListFragment extends Fragment
 
         if (fm != null) {
             dialog.show(getFragmentManager(), null);
+        }
+    }
+
+    private void onShowDetailsChange(AlarmViewModel vm) {
+
+        if (vm != null && vm.getShowDetails()) {
+            for(AlarmViewModel entry : _listAdapter.getItems()) {
+                if (entry != vm) {
+                    entry.setShowDetails(false);
+                }
+            }
         }
     }
 

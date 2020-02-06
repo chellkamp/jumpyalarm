@@ -22,8 +22,16 @@ public class AlarmViewModel extends BaseObservable {
     private SQLiteDatabase _db;
     private AlarmEntity _entity;
 
+    private final Object _memberLock = new Object();
+
+    private boolean _showDetails;
+
     private Runnable _userSelectTimeAction;
     private final Object _userSelectTimeActionLock = new Object();
+
+    private Runnable _onShowDetailsChanged;
+    private final Object _onShowDetailsChangedLock = new Object();
+
 
     /**
      * Constructor
@@ -47,21 +55,38 @@ public class AlarmViewModel extends BaseObservable {
      * @return ID of entry
      */
     @Bindable
-    public long getID() { return _entity.get_id(); }
+    public long getID() {
+        long retVal;
+        synchronized (_memberLock) {
+            retVal = _entity.get_id();
+        }
+        return retVal;
+    }
 
     /**
      * enabled property
      * @return alarm enabled
      */
     @Bindable
-    public synchronized boolean getEnabled() {
-        return _entity.getEnabled();
+    public boolean getEnabled() {
+        boolean retVal;
+        synchronized (_memberLock) {
+            retVal =_entity.getEnabled();
+        }
+        return retVal;
     }
 
-    public synchronized void setEnabled(boolean enabled) {
-        boolean oldVal = _entity.getEnabled();
-        if (oldVal != enabled) {
-            _entity.setEnabled(enabled);
+    public void setEnabled(boolean enabled) {
+        boolean changed;
+        synchronized (_memberLock) {
+            boolean oldVal = _entity.getEnabled();
+            changed = oldVal != enabled;
+            if (changed) {
+                _entity.setEnabled(enabled);
+            }
+        }
+
+        if (changed) {
             notifyPropertyChanged(BR.enabled);
             saveToDB();
         }
@@ -72,12 +97,25 @@ public class AlarmViewModel extends BaseObservable {
      * @return date/time combo of alarm time and "no earlier than" date to start alarm
      */
     @Bindable
-    public synchronized Date getOnOrAfter() { return _entity.getOnOrAfter(); }
+    public Date getOnOrAfter() {
+        Date retVal;
+        synchronized (_memberLock) {
+            retVal = _entity.getOnOrAfter();
+        }
+        return retVal;
+    }
 
-    public synchronized void setOnOrAfter(Date onOrAfter) {
-        Date oldVal = _entity.getOnOrAfter();
-        if (!oldVal.equals(onOrAfter)) {
-            _entity.setOnOrAfter(onOrAfter);
+    public void setOnOrAfter(Date onOrAfter) {
+        boolean changed;
+        synchronized (_memberLock) {
+            Date oldVal = _entity.getOnOrAfter();
+            changed = !oldVal.equals(onOrAfter);
+            if (changed) {
+                _entity.setOnOrAfter(onOrAfter);
+            }
+        }
+
+        if (changed) {
             notifyPropertyChanged(BR.onOrAfter);
             saveToDB();
         }
@@ -88,14 +126,25 @@ public class AlarmViewModel extends BaseObservable {
      * @return whether alarm is repeating
      */
     @Bindable
-    public synchronized boolean getRepeat() {
-        return _entity.getRepeat();
+    public boolean getRepeat() {
+        boolean retVal;
+        synchronized (_memberLock) {
+            retVal = _entity.getRepeat();
+        }
+        return retVal;
     }
 
-    public synchronized void setRepeat(boolean repeat) {
-        boolean oldVal = _entity.getRepeat();
-        if (oldVal != repeat) {
-            _entity.setRepeat(repeat);
+    public void setRepeat(boolean repeat) {
+        boolean changed;
+        synchronized (_memberLock) {
+            boolean oldVal = _entity.getRepeat();
+            changed = oldVal != repeat;
+            if (changed) {
+                _entity.setRepeat(repeat);
+            }
+        }
+
+        if (changed) {
             notifyPropertyChanged(BR.repeat);
             saveToDB();
         }
@@ -106,12 +155,25 @@ public class AlarmViewModel extends BaseObservable {
      * @return days of week that alarm is valid
      */
     @Bindable
-    public synchronized byte getDaysOfWeek() { return _entity.getDaysOfWeek(); }
+    public byte getDaysOfWeek() {
+        byte retVal;
+        synchronized (_memberLock) {
+            retVal = _entity.getDaysOfWeek();
+        }
+        return retVal;
+    }
 
-    public synchronized void setDaysOfWeek(byte days) {
-        byte oldVal = _entity.getDaysOfWeek();
-        if (oldVal != days) {
-            _entity.setDaysOfWeek(days);
+    public void setDaysOfWeek(byte days) {
+        boolean changed;
+        synchronized (_memberLock) {
+            byte oldVal = _entity.getDaysOfWeek();
+            changed = oldVal != days;
+            if (changed) {
+                _entity.setDaysOfWeek(days);
+            }
+        }
+
+        if (changed) {
             notifyPropertyChanged(BR.daysOfWeek);
             saveToDB();
         }
@@ -122,39 +184,98 @@ public class AlarmViewModel extends BaseObservable {
      * @return label for alarm
      */
     @Bindable
-    public synchronized String getLabel() {
-        return _entity.getLabel();
+    public String getLabel() {
+        String retVal;
+        synchronized (_memberLock) {
+            retVal = _entity.getLabel();
+        }
+        return retVal;
     }
 
-    public synchronized void setLabel(String label) {
-        String oldVal = _entity.getLabel();
+    public void setLabel(String label) {
         boolean changed = true;
-        if (oldVal != null && label != null) {
-            if (oldVal.equals(label)) {
+        synchronized (_memberLock) {
+            String oldVal = _entity.getLabel();
+            if (oldVal != null && label != null) {
+                if (oldVal.equals(label)) {
+                    changed = false;
+                }
+            } else if (oldVal == null && label == null) {
                 changed = false;
             }
-        } else if (oldVal == null && label == null) {
-            changed = false;
+            if (changed) {
+                _entity.setLabel(label);
+            }
         }
+
         if (changed) {
-            _entity.setLabel(label);
             notifyPropertyChanged(BR.label);
             saveToDB();
         }
     }
 
     public void runUserSelectTimeAction() {
+        Runnable action;
         synchronized (_userSelectTimeActionLock) {
-            if (_userSelectTimeAction != null) {
-                _userSelectTimeAction.run();
+            action = _userSelectTimeAction;
+        }
+
+        if (action != null) {
+            action.run();
+        }
+    }
+
+    public void setUserSelectTimeAction(Runnable action) {
+        synchronized (_userSelectTimeActionLock) {
+            if (_userSelectTimeAction != action) {
+                _userSelectTimeAction = action;
             }
         }
     }
 
-    public synchronized void setUserSelectTimeAction(Runnable action) {
-        synchronized (_userSelectTimeActionLock) {
-            if (_userSelectTimeAction != action) {
-                _userSelectTimeAction = action;
+    /**
+     * 'Show Details" property
+     * @return true if details should be shown; false otherwise
+     */
+    @Bindable
+    public boolean getShowDetails() {
+        boolean retVal;
+        synchronized (_memberLock) {
+            retVal = _showDetails;
+        }
+        return retVal;
+    }
+
+    public void setShowDetails(boolean showDetails) {
+        boolean changed;
+        synchronized (_memberLock) {
+            changed = _showDetails != showDetails;
+            if (changed) {
+                _showDetails = showDetails;
+            }
+        }
+
+        if (changed) {
+            notifyPropertyChanged(BR.showDetails);
+            runOnShowDetailsChanged();
+        }
+    }
+
+    private void runOnShowDetailsChanged() {
+        Runnable action;
+        synchronized (_onShowDetailsChangedLock) {
+            action = _onShowDetailsChanged;
+        }
+
+        if (action != null) {
+            action.run();
+        }
+    }
+
+    public void setOnShowDetailsChanged(Runnable action) {
+        synchronized (_onShowDetailsChangedLock) {
+            if (_onShowDetailsChanged != action) {
+                _onShowDetailsChanged = action;
             }
         }
     }
@@ -164,7 +285,9 @@ public class AlarmViewModel extends BaseObservable {
                 new Runnable() {
                     @Override
                     public void run() {
-                        _entity.persistToDB(_db);
+                        synchronized (_memberLock) {
+                            _entity.persistToDB(_db);
+                        }
                     }
                 }
         );
