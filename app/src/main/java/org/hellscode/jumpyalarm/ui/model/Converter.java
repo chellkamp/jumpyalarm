@@ -2,6 +2,8 @@ package org.hellscode.jumpyalarm.ui.model;
 
 import android.view.View;
 
+import androidx.databinding.InverseMethod;
+
 import org.hellscode.jumpyalarm.util.AlarmUtil;
 
 import java.text.SimpleDateFormat;
@@ -32,6 +34,21 @@ public class Converter {
     }
 
     /**
+     * Convert a Date object to a simple date for display
+     * @param val source value
+     * @return date string
+     */
+    public static String dateToDateString(Date val) {
+        String retVal = "";
+
+        if (val != null) {
+            retVal = SimpleDateFormat.getDateInstance().format(val);
+        }
+
+        return retVal;
+    }
+
+    /**
      * Compute a label to display for the date of the next alarm
      * @param date date/time - date is minimum date to start alarm, time is time of day that alarm
      *             will go off
@@ -45,11 +62,13 @@ public class Converter {
             boolean repeat,
             byte daysOfWeek,
             boolean enabled) {
-        String retVal = "Never";
+        String retVal;
 
         Date nextAlarm = AlarmUtil.getNextAlarm(date, repeat, daysOfWeek, enabled);
-        if (nextAlarm != null) {
-            retVal = SimpleDateFormat.getDateInstance().format(nextAlarm);
+        retVal = dateToDateString(nextAlarm);
+
+        if (retVal == null || retVal.isEmpty()) {
+            retVal = "Never";
         }
 
         return retVal;
@@ -62,5 +81,23 @@ public class Converter {
      */
     public static int showToVisibility(boolean show) {
         return show ? View.VISIBLE : View.GONE;
+    }
+
+    @InverseMethod("booleanToDaysOfWeekByte")
+    public static boolean daysOfWeekByteToBoolean(byte dayMask, AlarmViewModel vm, byte srcVal) {
+        return (dayMask & srcVal) != 0;
+    }
+
+    public static byte booleanToDaysOfWeekByte(byte dayMask, AlarmViewModel vm, boolean srcVal) {
+        // Note: bitwise operators in Java produce ints if the operands are bytes
+        byte daysOfWeek = vm.getDaysOfWeek();
+
+        if (srcVal) {
+            daysOfWeek = (byte)((daysOfWeek | dayMask) & 0xff);
+        } else {
+            daysOfWeek = (byte)(daysOfWeek & ~dayMask & 0xff);
+        }
+
+        return daysOfWeek;
     }
 }

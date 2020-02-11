@@ -4,4 +4,14 @@
     <string name="timer_tab_title">Timers</string>
     <string name="tbd_msg">This feature is TBD.</string>
     <string name="alarm_placeholder">Alarm list will go here.</string>
+    <string name="start_date_text">Not before:</string>
+    <string name="repeat_label">Repeat</string>
+    <string name="label_hint">Label</string>
+    <string name="day_sunday">Su</string>
+    <string name="day_monday">Mo</string>
+    <string name="day_tuesday">Tu</string>
+    <string name="day_wednesday">We</string>
+    <string name="day_thursday">Th</string>
+    <string name="day_friday">Fr</string>
+    <string name="day_saturday">Sa</string>
 </resources>

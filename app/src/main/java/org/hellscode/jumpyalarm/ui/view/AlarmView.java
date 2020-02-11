@@ -26,7 +26,6 @@ import org.hellscode.jumpyalarm.ui.model.AlarmViewModel;
 public class AlarmView extends LinearLayout {
 
     AlarmViewBinding _binding;
-    ViewModelPropChangedHandler _vmChangedHandler = new ViewModelPropChangedHandler();
 
     Drawable _expandIcon;
     Drawable _collapseIcon;
@@ -80,13 +79,6 @@ public class AlarmView extends LinearLayout {
      */
     public void setViewModel(AlarmViewModel viewModel)
     {
-        AlarmViewModel oldVal = _binding.getViewModel();
-        if (oldVal != null) {
-            oldVal.removeOnPropertyChangedCallback(_vmChangedHandler);
-        }
-        viewModel.addOnPropertyChangedCallback(_vmChangedHandler);
-        viewModel.notifyPropertyChanged(BR._all);
-
         _binding.setViewModel(viewModel);
         _binding.setLifecycleOwner(viewModel.getLifecycleOwner());
         _binding.invalidateAll();
@@ -110,25 +102,6 @@ public class AlarmView extends LinearLayout {
             System.exit(1);
         } else {
             _binding = DataBindingUtil.inflate(inflater, R.layout.alarm_view, this, true);
-        }
-    }
-
-    /**
-     * Manual bindings for viewmodel
-     */
-    private class ViewModelPropChangedHandler extends Observable.OnPropertyChangedCallback {
-        @Override
-        public void onPropertyChanged(Observable sender, int propertyId) {
-
-
-            if (sender instanceof AlarmViewModel) {
-                AlarmViewModel castObj = (AlarmViewModel)sender;
-                if (propertyId == org.hellscode.jumpyalarm.BR.showDetails ||
-                    propertyId == org.hellscode.jumpyalarm.BR._all) {
-                    Drawable foreground = castObj.getShowDetails() ? _collapseIcon : _expandIcon;
-                    _binding.expandBtn.setIcon(foreground);
-                }
-            }
         }
     }
 

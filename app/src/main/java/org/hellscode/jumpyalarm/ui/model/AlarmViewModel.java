@@ -18,6 +18,14 @@ import java.util.Date;
  */
 public class AlarmViewModel extends BaseObservable {
 
+    public static final byte MASK_SUNDAY = 0b1;
+    public static final byte MASK_MONDAY = 0b10;
+    public static final byte MASK_TUESDAY = 0b100;
+    public static final byte MASK_WEDNESDAY = 0b1000;
+    public static final byte MASK_THURSDAY = 0b10000;
+    public static final byte MASK_FRIDAY = 0b100000;
+    public static final byte MASK_SATURDAY = 0b1000000;
+
     private LifecycleOwner _lifecycleOwner;
     private SQLiteDatabase _db;
     private AlarmEntity _entity;
@@ -28,6 +36,9 @@ public class AlarmViewModel extends BaseObservable {
 
     private Runnable _userSelectTimeAction;
     private final Object _userSelectTimeActionLock = new Object();
+
+    private Runnable _userSelectDateAction;
+    private final Object _userSelectDateActionLock = new Object();
 
     private Runnable _onShowDetailsChanged;
     private final Object _onShowDetailsChangedLock = new Object();
@@ -229,6 +240,25 @@ public class AlarmViewModel extends BaseObservable {
         synchronized (_userSelectTimeActionLock) {
             if (_userSelectTimeAction != action) {
                 _userSelectTimeAction = action;
+            }
+        }
+    }
+
+    public void runUserSelectDateAction() {
+        Runnable action;
+        synchronized (_userSelectDateActionLock) {
+            action = _userSelectDateAction;
+        }
+
+        if (action != null) {
+            action.run();
+        }
+    }
+
+    public void setUserSelectDateAction(Runnable action) {
+        synchronized (_userSelectDateActionLock) {
+            if (_userSelectDateAction != action) {
+                _userSelectDateAction = action;
             }
         }
     }

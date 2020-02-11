@@ -20,13 +20,14 @@ import org.hellscode.jumpyalarm.ui.model.AlarmListAdapter;
 import org.hellscode.jumpyalarm.ui.model.AlarmViewModel;
 import org.hellscode.util.LoadWaitUtil;
 import org.hellscode.util.ui.DialogUtil;
+import org.hellscode.util.ui.view.DatePickerFragment;
 import org.hellscode.util.ui.view.TimePickerFragment;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
 public class AlarmListFragment extends Fragment
-        implements TimePickerFragment.TimePickerCallback {
+        implements TimePickerFragment.TimePickerCallback, DatePickerFragment.DatePickerCallback{
 
     private DatabaseHelper _dbHelper;
     private SQLiteDatabase _database;
@@ -108,6 +109,16 @@ public class AlarmListFragment extends Fragment
                             };
 
                             vm.setUserSelectTimeAction(timeAction);
+
+                            Runnable dateAction = new Runnable() {
+                                @Override
+                                public void run() {
+                                    onDateClick(idx, vm);
+                                }
+                            };
+
+                            vm.setUserSelectDateAction(dateAction);
+
                             vm.setOnShowDetailsChanged(
                                     new Runnable() {
                                         @Override
@@ -138,6 +149,28 @@ public class AlarmListFragment extends Fragment
         b.putInt(TimePickerFragment.MINUTE, c.get(Calendar.MINUTE));
 
         TimePickerFragment dialog = new TimePickerFragment();
+        dialog.setArguments(b);
+
+        FragmentManager fm = getFragmentManager();
+
+        if (fm != null) {
+            dialog.show(getFragmentManager(), null);
+        }
+    }
+
+    private void onDateClick(int lookupId, @NonNull AlarmViewModel vm) {
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(vm.getOnOrAfter());
+
+        Bundle b = new Bundle();
+        b.putString(DatePickerFragment.PARENT_TAG, getTag());
+        b.putInt(DatePickerFragment.LOOKUP_ID, lookupId);
+        b.putInt(DatePickerFragment.YEAR, c.get(Calendar.YEAR));
+        b.putInt(DatePickerFragment.MONTH, c.get(Calendar.MONTH));
+        b.putInt(DatePickerFragment.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH));
+
+        DatePickerFragment dialog = new DatePickerFragment();
         dialog.setArguments(b);
 
         FragmentManager fm = getFragmentManager();
@@ -179,6 +212,31 @@ public class AlarmListFragment extends Fragment
                 c.setTime(vm.getOnOrAfter());
                 c.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 c.set(Calendar.MINUTE, minute);
+                vm.setOnOrAfter(c.getTime());
+            }
+        }
+    }
+
+    @Override
+    public void onDateSet(final int lookupId, final int year, final int month, final int dayOfMonth) {
+        _loadWait.waitForLoad(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        onDateSetImpl(lookupId, year, month, dayOfMonth);
+                    }
+                }
+        );
+    }
+
+    private void onDateSetImpl(int lookupId, int year, int month, int dayOfMonth) {
+        // lookup id will be item index
+        if (lookupId >= 0 && lookupId < _listAdapter.getCount()) {
+            AlarmViewModel vm = (AlarmViewModel)_listAdapter.getItem(lookupId);
+            if (vm != null) {
+                Calendar c = Calendar.getInstance();
+                c.setTime(vm.getOnOrAfter());
+                c.set(year, month, dayOfMonth);
                 vm.setOnOrAfter(c.getTime());
             }
         }
