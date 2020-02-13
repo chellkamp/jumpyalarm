@@ -100,4 +100,12 @@ public class Converter {
 
         return daysOfWeek;
     }
+
+    public static String labelOrDefault(String label, String defaultVal) {
+        String retVal = defaultVal;
+        if (label != null && !label.isEmpty()) {
+            retVal = label;
+        }
+        return retVal;
+    }
 }

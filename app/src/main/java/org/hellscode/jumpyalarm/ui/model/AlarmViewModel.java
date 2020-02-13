@@ -39,6 +39,9 @@ public class AlarmViewModel extends BaseObservable {
 
     private Runnable _userSelectDateAction;
     private final Object _userSelectDateActionLock = new Object();
+    
+    private Runnable _userSelectLabelAction;
+    private final Object _userSelectLabelActionLock = new Object();
 
     private Runnable _onShowDetailsChanged;
     private final Object _onShowDetailsChangedLock = new Object();
@@ -259,6 +262,25 @@ public class AlarmViewModel extends BaseObservable {
         synchronized (_userSelectDateActionLock) {
             if (_userSelectDateAction != action) {
                 _userSelectDateAction = action;
+            }
+        }
+    }
+    
+    public void runUserSelectLabelAction() {
+        Runnable action;
+        synchronized (_userSelectLabelActionLock) {
+            action = _userSelectLabelAction;
+        }
+
+        if (action != null) {
+            action.run();
+        }
+    }
+
+    public void setUserSelectLabelAction(Runnable action) {
+        synchronized (_userSelectLabelActionLock) {
+            if (_userSelectLabelAction != action) {
+                _userSelectLabelAction = action;
             }
         }
     }

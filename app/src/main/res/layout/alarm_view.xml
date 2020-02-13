@@ -68,6 +68,7 @@
                     android:textSize="20sp"
                     android:text="@{Converter.dateToDateString(viewModel.onOrAfter)}"
                     android:onClick="@{()->viewModel.runUserSelectDateAction()}"
+                    android:enabled="@{viewModel.enabled}"
                     />
             </LinearLayout>
 
@@ -75,7 +76,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/repeat_label"
-                android:checked="@={viewModel.repeat}"/>
+                android:checked="@={viewModel.repeat}"
+                android:enabled="@{viewModel.enabled}"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -85,38 +87,68 @@
                 <com.google.android.material.checkbox.MaterialCheckBox
                     style="@style/WeekdayBtn"
                     android:text="@string/day_sunday"
-                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_SUNDAY, viewModel, viewModel.daysOfWeek)}"/>
+                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_SUNDAY, viewModel, viewModel.daysOfWeek)}"
+                    android:enabled="@{viewModel.enabled}"/>
                 <com.google.android.material.checkbox.MaterialCheckBox
                     style="@style/WeekdayBtn"
                     android:text="@string/day_monday"
-                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_MONDAY, viewModel, viewModel.daysOfWeek)}"/>
+                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_MONDAY, viewModel, viewModel.daysOfWeek)}"
+                    android:enabled="@{viewModel.enabled}"/>
                 <com.google.android.material.checkbox.MaterialCheckBox
                     style="@style/WeekdayBtn"
                     android:text="@string/day_tuesday"
-                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_TUESDAY, viewModel, viewModel.daysOfWeek)}"/>
+                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_TUESDAY, viewModel, viewModel.daysOfWeek)}"
+                    android:enabled="@{viewModel.enabled}"/>
                 <com.google.android.material.checkbox.MaterialCheckBox
                     style="@style/WeekdayBtn"
                     android:text="@string/day_wednesday"
-                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_WEDNESDAY, viewModel, viewModel.daysOfWeek)}"/>
+                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_WEDNESDAY, viewModel, viewModel.daysOfWeek)}"
+                    android:enabled="@{viewModel.enabled}"/>
                 <com.google.android.material.checkbox.MaterialCheckBox
                     style="@style/WeekdayBtn"
                     android:text="@string/day_thursday"
-                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_THURSDAY, viewModel, viewModel.daysOfWeek)}"/>
+                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_THURSDAY, viewModel, viewModel.daysOfWeek)}"
+                    android:enabled="@{viewModel.enabled}"/>
                 <com.google.android.material.checkbox.MaterialCheckBox
                     style="@style/WeekdayBtn"
                     android:text="@string/day_friday"
-                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_FRIDAY, viewModel, viewModel.daysOfWeek)}"/>
+                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_FRIDAY, viewModel, viewModel.daysOfWeek)}"
+                    android:enabled="@{viewModel.enabled}"/>
                 <com.google.android.material.checkbox.MaterialCheckBox
                     style="@style/WeekdayBtn"
                     android:text="@string/day_saturday"
-                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_SATURDAY, viewModel, viewModel.daysOfWeek)}"/>
+                    android:checked="@={Converter.daysOfWeekByteToBoolean(AlarmViewModel.MASK_SATURDAY, viewModel, viewModel.daysOfWeek)}"
+                    android:enabled="@{viewModel.enabled}"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
+                    android:text="@string/label_text"/>
+                <com.google.android.material.button.MaterialButton
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minWidth="50sp"
+                    android:textAllCaps="false"
+                    android:gravity="start|center_vertical"
+                    android:text="@{Converter.labelOrDefault(viewModel.label, @string/label_default)}"
+                    android:onClick="@{()->viewModel.runUserSelectLabelAction()}"
+                    android:enabled="@{viewModel.enabled}"
+                    />
             </LinearLayout>
 
         </LinearLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/nextAlarmDateText"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"

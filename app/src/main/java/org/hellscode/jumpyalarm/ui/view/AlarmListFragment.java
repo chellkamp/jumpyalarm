@@ -21,13 +21,16 @@ import org.hellscode.jumpyalarm.ui.model.AlarmViewModel;
 import org.hellscode.util.LoadWaitUtil;
 import org.hellscode.util.ui.DialogUtil;
 import org.hellscode.util.ui.view.DatePickerFragment;
+import org.hellscode.util.ui.view.TextEditFragment;
 import org.hellscode.util.ui.view.TimePickerFragment;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
 public class AlarmListFragment extends Fragment
-        implements TimePickerFragment.TimePickerCallback, DatePickerFragment.DatePickerCallback{
+        implements TimePickerFragment.TimePickerCallback,
+        DatePickerFragment.DatePickerCallback,
+        TextEditFragment.TextEditCallback{
 
     private DatabaseHelper _dbHelper;
     private SQLiteDatabase _database;
@@ -118,6 +121,15 @@ public class AlarmListFragment extends Fragment
                             };
 
                             vm.setUserSelectDateAction(dateAction);
+
+                            Runnable labelAction = new Runnable() {
+                                @Override
+                                public void run() {
+                                    onLabelClick(idx, vm);
+                                }
+                            };
+
+                            vm.setUserSelectLabelAction(labelAction);
 
                             vm.setOnShowDetailsChanged(
                                     new Runnable() {
@@ -238,6 +250,46 @@ public class AlarmListFragment extends Fragment
                 c.setTime(vm.getOnOrAfter());
                 c.set(year, month, dayOfMonth);
                 vm.setOnOrAfter(c.getTime());
+            }
+        }
+    }
+
+    private void onLabelClick(int lookupId, @NonNull AlarmViewModel vm) {
+        String label = vm.getLabel();
+
+        Bundle b = new Bundle();
+        b.putString(TextEditFragment.PARENT_TAG, getTag());
+        b.putInt(TextEditFragment.LOOKUP_ID, lookupId);
+        b.putString(TextEditFragment.TEXT, label);
+
+        TextEditFragment dialog = new TextEditFragment();
+        dialog.setArguments(b);
+
+        FragmentManager fm = getFragmentManager();
+
+        if (fm != null) {
+            dialog.show(getFragmentManager(), null);
+        }
+    }
+
+    @Override
+    public void onTextSet(final int lookupId, final String text) {
+        _loadWait.waitForLoad(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        onTextSetImpl(lookupId, text);
+                    }
+                }
+        );
+    }
+
+    private void onTextSetImpl(int lookupId, String text) {
+        // lookup id will be item index
+        if (lookupId >= 0 && lookupId < _listAdapter.getCount()) {
+            AlarmViewModel vm = (AlarmViewModel)_listAdapter.getItem(lookupId);
+            if (vm != null) {
+                vm.setLabel(text);
             }
         }
     }
