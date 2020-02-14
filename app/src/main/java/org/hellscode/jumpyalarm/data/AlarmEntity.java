@@ -41,7 +41,7 @@ public class AlarmEntity {
     public AlarmEntity() {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.MILLISECOND, 0);
 
         _field_OnOrAfter = c.getTime();
     }

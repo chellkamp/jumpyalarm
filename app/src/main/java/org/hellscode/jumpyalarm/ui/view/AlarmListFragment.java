@@ -13,12 +13,16 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import org.hellscode.jumpyalarm.R;
 import org.hellscode.jumpyalarm.data.AlarmEntity;
 import org.hellscode.jumpyalarm.data.DatabaseHelper;
 import org.hellscode.jumpyalarm.ui.model.AlarmListAdapter;
 import org.hellscode.jumpyalarm.ui.model.AlarmViewModel;
 import org.hellscode.util.LoadWaitUtil;
+import org.hellscode.util.SimpleMethod;
+import org.hellscode.util.SimpleVoidMethod;
 import org.hellscode.util.ui.DialogUtil;
 import org.hellscode.util.ui.view.DatePickerFragment;
 import org.hellscode.util.ui.view.TextEditFragment;
@@ -38,7 +42,8 @@ public class AlarmListFragment extends Fragment
     private ListView _listView;
     private AlarmListAdapter _listAdapter;
 
-    private LoadWaitUtil _loadWait = new LoadWaitUtil();
+    private LoadWaitUtil<Object, ArrayList<AlarmViewModel>> _loadWait =
+            new LoadWaitUtil<>();
 
     /**
      * Called to create the view for the fragment
@@ -55,6 +60,12 @@ public class AlarmListFragment extends Fragment
 
         _listView = retVal.findViewById(R.id.alarmList);
 
+        FloatingActionButton addBtn = retVal.findViewById(R.id.add_button);
+
+        if (addBtn != null) {
+            addBtn.setOnClickListener(new AddClickListener());
+        }
+
         initializeDatabase();
 
         return retVal;
@@ -69,39 +80,39 @@ public class AlarmListFragment extends Fragment
         } else {
 
             // load database
-            DialogUtil.runWaitDialog(activity, null, "loading...", null,
-                    new Runnable() {
+            new DialogUtil<Object, ArrayList<AlarmViewModel>>().
+                    runWaitDialog(activity, null, "loading...", null,
+                    new SimpleMethod<Object, ArrayList<AlarmViewModel>>() {
                         @Override
-                        public void run() {
+                        public ArrayList<AlarmViewModel> run(Object arg) {
                             _dbHelper = DatabaseHelper.getInstance();
                             _database = _dbHelper.getWritableDatabase();
-                            _listAdapter = new AlarmListAdapter(
-                                    getViewLifecycleOwner(),
-                                    _database);
-                            refreshData();
+                            _listAdapter = new AlarmListAdapter(_database);
+                            return retrieveAlarmVMs();
                         }
-                    },
-                    new Runnable() {
+                    }, null,
+                    new SimpleVoidMethod<ArrayList<AlarmViewModel>>() {
                         @Override
-                        public void run() {
+                        public void run(ArrayList<AlarmViewModel> arg) {
                             _listView.setAdapter(_listAdapter);
+                            _listAdapter.setItems(arg);
                         }
                     }
             );
         }
     }
 
-    private void refreshData() {
-        _loadWait.performLoad(
-                new Runnable() {
+    private ArrayList<AlarmViewModel> retrieveAlarmVMs() {
+        return _loadWait.performLoad(
+                new SimpleMethod<Object, ArrayList<AlarmViewModel>>() {
                     @Override
-                    public void run() {
+                    public ArrayList<AlarmViewModel> run(Object o) {
                         ArrayList<AlarmEntity> entities = AlarmEntity.loadAll(_database);
                         ArrayList<AlarmViewModel> data = new ArrayList<>();
 
                         for (int i = 0; i < entities.size(); ++i) {
                             AlarmEntity entity = entities.get(i);
-                            final AlarmViewModel vm = new AlarmViewModel(getViewLifecycleOwner(), _database, entity);
+                            final AlarmViewModel vm = new AlarmViewModel(_database, entity);
                             final int idx = i;
 
                             Runnable timeAction = new Runnable() {
@@ -143,9 +154,10 @@ public class AlarmListFragment extends Fragment
                             data.add(vm);
                         }
 
-                        _listAdapter.setItems(data);
+                        return data;
                     }
-                }
+                },
+                null
         );
     }
 
@@ -224,6 +236,8 @@ public class AlarmListFragment extends Fragment
                 c.setTime(vm.getOnOrAfter());
                 c.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 c.set(Calendar.MINUTE, minute);
+                c.set(Calendar.SECOND, 0);
+                c.set(Calendar.MILLISECOND, 0);
                 vm.setOnOrAfter(c.getTime());
             }
         }
@@ -294,4 +308,31 @@ public class AlarmListFragment extends Fragment
         }
     }
 
+    private class AddClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            AlarmEntity newEntity = new AlarmEntity();
+            Activity activity = getActivity();
+            if (activity != null && _database != null) {
+                newEntity.persistToDB(_database);
+                // load database
+                new DialogUtil<Object, ArrayList<AlarmViewModel>>().
+                        runWaitDialog(activity, null, "refreshing...", null,
+                                new SimpleMethod<Object, ArrayList<AlarmViewModel>>() {
+                                    @Override
+                                    public ArrayList<AlarmViewModel> run(Object arg) {
+                                        return retrieveAlarmVMs();
+                                    }
+                                },
+                                null,
+                                new SimpleVoidMethod<ArrayList<AlarmViewModel>>() {
+                                    @Override
+                                    public void run(ArrayList<AlarmViewModel> arg) {
+                                        _listAdapter.setItems(arg);
+                                    }
+                                }
+                        );
+            }
+        }
+    }
 }

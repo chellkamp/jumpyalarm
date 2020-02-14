@@ -8,7 +8,7 @@ import java.util.concurrent.Semaphore;
 /**
  * Facilitate waiting for loads in a Fragment or Activity
  */
-public class LoadWaitUtil {
+public class LoadWaitUtil<T,R> {
     private final Object _loadLock = new Object();
     private boolean _loaded;
     private ArrayList<Semaphore> _semaphoreColl = new ArrayList<>();
@@ -19,14 +19,17 @@ public class LoadWaitUtil {
      * when done.
      * @param r method that does load operation
      *          that needs to happen before waiting
-     *          client code is called
+     *          client code is called.  The argument to pass in is of type T.
+     *          The return type is type R.
+     * @param arg argument to pass in to method r
      */
-    public void performLoad(@NonNull Runnable r) {
+    public R performLoad(@NonNull SimpleMethod<T,R> r, T arg) {
+        R retVal;
         synchronized (_loadLock) {
             _loaded = false;
         }
 
-        r.run();
+        retVal = r.run(arg);
 
         synchronized (_loadLock) {
             _loaded = true;
@@ -39,6 +42,7 @@ public class LoadWaitUtil {
             }
             _semaphoreColl.clear();
         }
+        return retVal;
     }
 
     /**

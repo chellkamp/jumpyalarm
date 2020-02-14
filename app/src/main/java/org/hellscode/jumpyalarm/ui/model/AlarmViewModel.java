@@ -7,7 +7,6 @@ import androidx.annotation.Nullable;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 import androidx.databinding.library.baseAdapters.BR;
-import androidx.lifecycle.LifecycleOwner;
 
 import org.hellscode.jumpyalarm.data.AlarmEntity;
 
@@ -26,7 +25,6 @@ public class AlarmViewModel extends BaseObservable {
     public static final byte MASK_FRIDAY = 0b100000;
     public static final byte MASK_SATURDAY = 0b1000000;
 
-    private LifecycleOwner _lifecycleOwner;
     private SQLiteDatabase _db;
     private AlarmEntity _entity;
 
@@ -49,20 +47,15 @@ public class AlarmViewModel extends BaseObservable {
 
     /**
      * Constructor
-     * @param lifecycleOwner lifecycle owner for the live data members
      * @param db database connection
      * @param entity alarm database entity
      */
     public AlarmViewModel(
-            @NonNull LifecycleOwner lifecycleOwner,
             @NonNull SQLiteDatabase db,
             @NonNull AlarmEntity entity) {
-        _lifecycleOwner = lifecycleOwner;
         _db = db;
         _entity = entity;
     }
-
-    public LifecycleOwner getLifecycleOwner() { return _lifecycleOwner;}
 
     /**
      * ID property.  Read-only.

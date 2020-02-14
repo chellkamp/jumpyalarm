@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.LifecycleOwner;
 
 import org.hellscode.jumpyalarm.ui.view.AlarmView;
 
@@ -16,21 +15,16 @@ import java.util.ArrayList;
 
 public class AlarmListAdapter extends BaseAdapter {
 
-    private LifecycleOwner _lifecycleOwner;
     private SQLiteDatabase _db;
     private final Object _itemLock = new Object();
     private ArrayList<AlarmViewModel> _items = new ArrayList<>();
 
     /**
      * Constructor
-     * @param lifecycleOwner lifecycle owner to use when creating LiveData
      * @param db database connection
      */
-    public AlarmListAdapter(
-            @NonNull LifecycleOwner lifecycleOwner,
-            @NonNull SQLiteDatabase db) {
+    public AlarmListAdapter(@NonNull SQLiteDatabase db) {
         super();
-        _lifecycleOwner = lifecycleOwner;
         _db = db;
     }
 
