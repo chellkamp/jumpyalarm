@@ -17,7 +17,7 @@ public class DatePickerFragment extends DialogFragment {
      * Provides an entry point for the dialog to return its info to
      */
     public interface DatePickerCallback {
-        void onDateSet(int lookupId, int year, int month, int day);
+        void onDateSet(long lookupId, int year, int month, int day);
     }
 
     public static final String PARENT_TAG = "tag";
@@ -30,7 +30,7 @@ public class DatePickerFragment extends DialogFragment {
     public @NonNull
     Dialog onCreateDialog(Bundle savedInstanceState) {
         String parentTag = null;
-        int lookupId = -1;
+        long lookupId = -1;
 
         Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
@@ -41,7 +41,7 @@ public class DatePickerFragment extends DialogFragment {
 
         if(args != null) {
             parentTag = args.getString(PARENT_TAG);
-            lookupId = args.getInt(LOOKUP_ID, lookupId);
+            lookupId = args.getLong(LOOKUP_ID, lookupId);
             year = args.getInt(YEAR, year);
             month = args.getInt(MONTH, month);
             dayOfMonth = args.getInt(DAY_OF_MONTH, dayOfMonth);
@@ -55,9 +55,9 @@ public class DatePickerFragment extends DialogFragment {
     private static class Listener implements DatePickerDialog.OnDateSetListener {
         private Fragment _owner;
         private String _parentTag;
-        private int _lookupId;
+        private long _lookupId;
 
-        Listener(Fragment owner, String parentTag, int lookupId) {
+        Listener(Fragment owner, String parentTag, long lookupId) {
             _owner = owner;
             _parentTag = parentTag;
             _lookupId = lookupId;

@@ -19,7 +19,7 @@ public class TimePickerFragment extends DialogFragment {
      * Provides an entry point for the dialog to return its info to
      */
     public interface TimePickerCallback {
-        void onTimeSet(int lookupId, int hourOfDay, int minute);
+        void onTimeSet(long lookupId, int hourOfDay, int minute);
     }
 
     public static final String PARENT_TAG = "tag";
@@ -30,7 +30,7 @@ public class TimePickerFragment extends DialogFragment {
     @Override
     public @NonNull Dialog onCreateDialog(Bundle savedInstanceState) {
         String parentTag = null;
-        int lookupId = -1;
+        long lookupId = -1;
 
         Calendar c = Calendar.getInstance();
         int hourOfDay = c.get(Calendar.HOUR_OF_DAY);
@@ -40,7 +40,7 @@ public class TimePickerFragment extends DialogFragment {
 
         if(args != null) {
             parentTag = args.getString(PARENT_TAG);
-            lookupId = args.getInt(LOOKUP_ID, lookupId);
+            lookupId = args.getLong(LOOKUP_ID, lookupId);
             hourOfDay = args.getInt(HOUROFDAY, hourOfDay);
             minute = args.getInt(MINUTE, minute);
         }
@@ -52,11 +52,11 @@ public class TimePickerFragment extends DialogFragment {
     }
 
     private static class Listener implements TimePickerDialog.OnTimeSetListener {
-        private  Fragment _owner;
+        private Fragment _owner;
         private String _parentTag;
-        private int _lookupId;
+        private long _lookupId;
 
-        Listener(Fragment owner, String parentTag, int lookupId) {
+        Listener(Fragment owner, String parentTag, long lookupId) {
             _owner = owner;
             _parentTag = parentTag;
             _lookupId = lookupId;

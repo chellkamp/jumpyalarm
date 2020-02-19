@@ -1,6 +1,7 @@
 package org.hellscode.jumpyalarm.ui.view;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,9 +11,11 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.hellscode.jumpyalarm.R;
@@ -102,6 +105,57 @@ public class AlarmListFragment extends Fragment
         }
     }
 
+    private AlarmViewModel createVM(AlarmEntity entity) {
+        final AlarmViewModel vm = new AlarmViewModel(_database, entity);
+
+        Runnable timeAction = new Runnable() {
+            @Override
+            public void run() {
+                onTimeClick(vm);
+            }
+        };
+
+        vm.setUserSelectTimeAction(timeAction);
+
+        Runnable dateAction = new Runnable() {
+            @Override
+            public void run() {
+                onDateClick(vm);
+            }
+        };
+
+        vm.setUserSelectDateAction(dateAction);
+
+        Runnable labelAction = new Runnable() {
+            @Override
+            public void run() {
+                onLabelClick(vm);
+            }
+        };
+
+        vm.setUserSelectLabelAction(labelAction);
+
+        Runnable deleteAction = new Runnable() {
+            @Override
+            public void run() {
+                onDeleteClick(vm);
+            }
+        };
+
+        vm.setUserDeleteAction(deleteAction);
+
+        vm.setOnShowDetailsChanged(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        onShowDetailsChange(vm);
+                    }
+                }
+        );
+
+        return vm;
+    }
+
     private ArrayList<AlarmViewModel> retrieveAlarmVMs() {
         return _loadWait.performLoad(
                 new SimpleMethod<Object, ArrayList<AlarmViewModel>>() {
@@ -110,47 +164,8 @@ public class AlarmListFragment extends Fragment
                         ArrayList<AlarmEntity> entities = AlarmEntity.loadAll(_database);
                         ArrayList<AlarmViewModel> data = new ArrayList<>();
 
-                        for (int i = 0; i < entities.size(); ++i) {
-                            AlarmEntity entity = entities.get(i);
-                            final AlarmViewModel vm = new AlarmViewModel(_database, entity);
-                            final int idx = i;
-
-                            Runnable timeAction = new Runnable() {
-                                @Override
-                                public void run() {
-                                    onTimeClick(idx, vm);
-                                }
-                            };
-
-                            vm.setUserSelectTimeAction(timeAction);
-
-                            Runnable dateAction = new Runnable() {
-                                @Override
-                                public void run() {
-                                    onDateClick(idx, vm);
-                                }
-                            };
-
-                            vm.setUserSelectDateAction(dateAction);
-
-                            Runnable labelAction = new Runnable() {
-                                @Override
-                                public void run() {
-                                    onLabelClick(idx, vm);
-                                }
-                            };
-
-                            vm.setUserSelectLabelAction(labelAction);
-
-                            vm.setOnShowDetailsChanged(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            onShowDetailsChange(vm);
-                                        }
-                                    }
-                            );
-
+                        for (AlarmEntity entity : entities) {
+                            AlarmViewModel vm = createVM(entity);
                             data.add(vm);
                         }
 
@@ -161,14 +176,16 @@ public class AlarmListFragment extends Fragment
         );
     }
 
-    private void onTimeClick(int lookupId, @NonNull AlarmViewModel vm) {
+    private void onTimeClick(@NonNull AlarmViewModel vm) {
 
         Calendar c = Calendar.getInstance();
         c.setTime(vm.getOnOrAfter());
 
+        long lookupId = vm.getID();
+
         Bundle b = new Bundle();
         b.putString(TimePickerFragment.PARENT_TAG, getTag());
-        b.putInt(TimePickerFragment.LOOKUP_ID, lookupId);
+        b.putLong(TimePickerFragment.LOOKUP_ID, lookupId);
         b.putInt(TimePickerFragment.HOUROFDAY, c.get(Calendar.HOUR_OF_DAY));
         b.putInt(TimePickerFragment.MINUTE, c.get(Calendar.MINUTE));
 
@@ -182,14 +199,16 @@ public class AlarmListFragment extends Fragment
         }
     }
 
-    private void onDateClick(int lookupId, @NonNull AlarmViewModel vm) {
+    private void onDateClick(@NonNull AlarmViewModel vm) {
 
         Calendar c = Calendar.getInstance();
         c.setTime(vm.getOnOrAfter());
 
+        long lookupId = vm.getID();
+
         Bundle b = new Bundle();
         b.putString(DatePickerFragment.PARENT_TAG, getTag());
-        b.putInt(DatePickerFragment.LOOKUP_ID, lookupId);
+        b.putLong(DatePickerFragment.LOOKUP_ID, lookupId);
         b.putInt(DatePickerFragment.YEAR, c.get(Calendar.YEAR));
         b.putInt(DatePickerFragment.MONTH, c.get(Calendar.MONTH));
         b.putInt(DatePickerFragment.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH));
@@ -216,7 +235,7 @@ public class AlarmListFragment extends Fragment
     }
 
     @Override
-    public void onTimeSet(final int lookupId, final int hourOfDay, final int minute) {
+    public void onTimeSet(final long lookupId, final int hourOfDay, final int minute) {
         _loadWait.waitForLoad(
                 new Runnable() {
                     @Override
@@ -227,10 +246,29 @@ public class AlarmListFragment extends Fragment
         );
     }
 
-    private void onTimeSetImpl(int lookupId, int hourOfDay, int minute) {
-        // lookup id will be item index
-        if (lookupId >= 0 && lookupId < _listAdapter.getCount()) {
-            AlarmViewModel vm = (AlarmViewModel)_listAdapter.getItem(lookupId);
+    private int getItemPosById(long id) {
+        ArrayList<AlarmViewModel> itemList = _listAdapter.getItems();
+        int numItems = itemList.size();
+
+        int retVal = -1;
+        boolean found = false;
+        for (int i = 0; !found && i < numItems; ++i) {
+            AlarmViewModel curItem = itemList.get(i);
+            if (curItem != null && curItem.getID() == id) {
+                retVal = i;
+                found = true;
+            }
+        }
+        return retVal;
+    }
+
+    private void onTimeSetImpl(long lookupId, int hourOfDay, int minute) {
+        // lookup id will be ID of alarm in DB
+
+        int position = getItemPosById(lookupId);
+
+        if (position >= 0) {
+            AlarmViewModel vm = (AlarmViewModel)_listAdapter.getItem(position);
             if (vm != null) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(vm.getOnOrAfter());
@@ -244,7 +282,7 @@ public class AlarmListFragment extends Fragment
     }
 
     @Override
-    public void onDateSet(final int lookupId, final int year, final int month, final int dayOfMonth) {
+    public void onDateSet(final long lookupId, final int year, final int month, final int dayOfMonth) {
         _loadWait.waitForLoad(
                 new Runnable() {
                     @Override
@@ -255,10 +293,12 @@ public class AlarmListFragment extends Fragment
         );
     }
 
-    private void onDateSetImpl(int lookupId, int year, int month, int dayOfMonth) {
-        // lookup id will be item index
-        if (lookupId >= 0 && lookupId < _listAdapter.getCount()) {
-            AlarmViewModel vm = (AlarmViewModel)_listAdapter.getItem(lookupId);
+    private void onDateSetImpl(long lookupId, int year, int month, int dayOfMonth) {
+        // lookup id will be item ID in database
+        int position = getItemPosById(lookupId);
+
+        if (lookupId >= 0) {
+            AlarmViewModel vm = (AlarmViewModel)_listAdapter.getItem(position);
             if (vm != null) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(vm.getOnOrAfter());
@@ -268,12 +308,13 @@ public class AlarmListFragment extends Fragment
         }
     }
 
-    private void onLabelClick(int lookupId, @NonNull AlarmViewModel vm) {
+    private void onLabelClick(@NonNull AlarmViewModel vm) {
         String label = vm.getLabel();
+        long lookupId = vm.getID();
 
         Bundle b = new Bundle();
         b.putString(TextEditFragment.PARENT_TAG, getTag());
-        b.putInt(TextEditFragment.LOOKUP_ID, lookupId);
+        b.putLong(TextEditFragment.LOOKUP_ID, lookupId);
         b.putString(TextEditFragment.TEXT, label);
 
         TextEditFragment dialog = new TextEditFragment();
@@ -287,7 +328,7 @@ public class AlarmListFragment extends Fragment
     }
 
     @Override
-    public void onTextSet(final int lookupId, final String text) {
+    public void onTextSet(final long lookupId, final String text) {
         _loadWait.waitForLoad(
                 new Runnable() {
                     @Override
@@ -298,10 +339,12 @@ public class AlarmListFragment extends Fragment
         );
     }
 
-    private void onTextSetImpl(int lookupId, String text) {
-        // lookup id will be item index
-        if (lookupId >= 0 && lookupId < _listAdapter.getCount()) {
-            AlarmViewModel vm = (AlarmViewModel)_listAdapter.getItem(lookupId);
+    private void onTextSetImpl(long lookupId, String text) {
+        // lookup id will be item ID in the database
+        int position = getItemPosById(lookupId);
+
+        if (lookupId >= 0) {
+            AlarmViewModel vm = (AlarmViewModel)_listAdapter.getItem(position);
             if (vm != null) {
                 vm.setLabel(text);
             }
@@ -315,24 +358,37 @@ public class AlarmListFragment extends Fragment
             Activity activity = getActivity();
             if (activity != null && _database != null) {
                 newEntity.persistToDB(_database);
-                // load database
-                new DialogUtil<Object, ArrayList<AlarmViewModel>>().
-                        runWaitDialog(activity, null, "refreshing...", null,
-                                new SimpleMethod<Object, ArrayList<AlarmViewModel>>() {
-                                    @Override
-                                    public ArrayList<AlarmViewModel> run(Object arg) {
-                                        return retrieveAlarmVMs();
-                                    }
-                                },
-                                null,
-                                new SimpleVoidMethod<ArrayList<AlarmViewModel>>() {
-                                    @Override
-                                    public void run(ArrayList<AlarmViewModel> arg) {
-                                        _listAdapter.setItems(arg);
-                                    }
-                                }
-                        );
+                AlarmViewModel newVM = createVM(newEntity);
+
+                _listAdapter.appendItem(newVM);
+                newVM.setShowDetails(true);
+                _listView.smoothScrollToPosition(_listAdapter.getCount() - 1);
             }
         }
     }
+
+    private void onDeleteClick(final @NonNull AlarmViewModel vm) {
+
+        Activity activity = getActivity();
+
+        if (activity != null) {
+            AlertDialog dialog = new MaterialAlertDialogBuilder(activity)
+                    .setMessage(R.string.delete_alarm_msg)
+                    .setPositiveButton(R.string.delete_positive,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    if (_listAdapter != null) {
+                                        _listAdapter.removeItem(vm);
+                                    }
+                                }
+                            }
+                    )
+                    .setNegativeButton(R.string.cancel_text, null)
+                    .create();
+
+            dialog.show();
+        }
+    }
+
 }

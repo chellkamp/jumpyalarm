@@ -15,4 +15,7 @@
     <string name="day_friday">Fr</string>
     <string name="day_saturday">Sa</string>
     <string name="label_default">Enter label here</string>
+    <string name="delete_alarm_msg">Delete this alarm?</string>
+    <string name="delete_positive">Delete</string>
+    <string name="cancel_text">Cancel</string>
 </resources>

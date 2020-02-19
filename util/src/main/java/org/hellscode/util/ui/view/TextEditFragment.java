@@ -28,7 +28,7 @@ public class TextEditFragment extends DialogFragment {
      * Provides an entry point for the dialog to return its info to
      */
     public interface TextEditCallback {
-        void onTextSet(int lookupId, String text);
+        void onTextSet(long lookupId, String text);
     }
 
     public static final String PARENT_TAG = "tag";
@@ -42,14 +42,14 @@ public class TextEditFragment extends DialogFragment {
     public @NonNull
     Dialog onCreateDialog(Bundle savedInstanceState) {
         String parentTag = null;
-        int lookupId = -1;
+        long lookupId = -1;
         String text = null;
 
         Bundle args = getArguments();
 
         if(args != null) {
             parentTag = args.getString(PARENT_TAG);
-            lookupId = args.getInt(LOOKUP_ID, lookupId);
+            lookupId = args.getLong(LOOKUP_ID, lookupId);
             text = args.getString(TEXT, text);
         }
 
@@ -84,9 +84,9 @@ public class TextEditFragment extends DialogFragment {
 
         private Fragment _owner;
         private String _parentTag;
-        private int _lookupId;
+        private long _lookupId;
 
-        PosListener(Fragment owner, String parentTag, int lookupId) {
+        PosListener(Fragment owner, String parentTag, long lookupId) {
             _owner = owner;
             _parentTag = parentTag;
             _lookupId = lookupId;

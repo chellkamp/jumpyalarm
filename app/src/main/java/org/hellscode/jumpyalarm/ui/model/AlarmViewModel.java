@@ -41,6 +41,9 @@ public class AlarmViewModel extends BaseObservable {
     private Runnable _userSelectLabelAction;
     private final Object _userSelectLabelActionLock = new Object();
 
+    private Runnable _userDeleteAction;
+    private final Object _userDeleteActionLock = new Object();
+
     private Runnable _onShowDetailsChanged;
     private final Object _onShowDetailsChangedLock = new Object();
 
@@ -275,6 +278,20 @@ public class AlarmViewModel extends BaseObservable {
             if (_userSelectLabelAction != action) {
                 _userSelectLabelAction = action;
             }
+        }
+    }
+
+    public void runUserDeleteAction() {
+        synchronized (_userDeleteActionLock) {
+            if (_userDeleteAction != null) {
+                _userDeleteAction.run();
+            }
+        }
+    }
+
+    public void setUserDeleteAction(Runnable action) {
+        synchronized (_userDeleteActionLock) {
+            _userDeleteAction = action;
         }
     }
 

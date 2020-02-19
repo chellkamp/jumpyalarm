@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp">
     <data>
         <import type="org.hellscode.jumpyalarm.ui.model.Converter"/>
         <import type="org.hellscode.jumpyalarm.ui.model.AlarmViewModel"/>
@@ -24,25 +27,43 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
-                android:layout_toStartOf="@id/enabledSwitch"
-                android:layout_toLeftOf="@id/enabledSwitch"
-                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/actionPanel"
+                android:layout_toLeftOf="@id/actionPanel"
                 android:onClick="@{() -> viewModel.runUserSelectTimeAction()}"
                 android:enabled="@{viewModel.enabled}"
                 android:gravity="center_vertical"
+                android:layout_alignBottom="@id/actionPanel"
                 android:text="@{Converter.dateToTimeString(viewModel.onOrAfter)}"
                 android:textSize="50sp" />
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/enabledSwitch"
+            <LinearLayout
+                android:id="@+id/actionPanel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
+                android:orientation="vertical"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:checked="@={viewModel.enabled}">
+                android:layout_alignParentRight="true">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/deleteBtn"
+                    style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:icon="@drawable/baseline_clear_black_24"
+                    android:minWidth="24dp"
+                    android:minHeight="24dp"
+                    android:onClick="@{()->viewModel.runUserDeleteAction()}"/>
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/enabledSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:checked="@={viewModel.enabled}"/>
+            </LinearLayout>
 
-            </com.google.android.material.switchmaterial.SwitchMaterial>
+
         </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"

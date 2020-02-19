@@ -55,6 +55,20 @@ public class AlarmListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void appendItem(@NonNull AlarmViewModel item) {
+        synchronized (_itemLock) {
+            _items.add(item);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void removeItem(@NonNull AlarmViewModel item) {
+        synchronized (_itemLock) {
+            _items.remove(item);
+        }
+        notifyDataSetChanged();
+    }
+
     /**
      * Get number of items in list.
      * @return item count
