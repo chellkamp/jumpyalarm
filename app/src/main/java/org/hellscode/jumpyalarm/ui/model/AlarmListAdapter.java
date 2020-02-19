@@ -128,8 +128,14 @@ public class AlarmListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup viewGroup) {
 
-        Context c = viewGroup.getContext();
-        AlarmView retVal = new AlarmView(c);
+        AlarmView retVal;
+
+        if (convertView instanceof AlarmView) {
+            retVal = (AlarmView)convertView;
+        } else {
+            Context c = viewGroup.getContext();
+            retVal = new AlarmView(c);
+        }
 
         synchronized (_itemLock) {
             if (position >= 0 && position < _items.size()) {
@@ -137,6 +143,7 @@ public class AlarmListAdapter extends BaseAdapter {
                 retVal.setViewModel(item);
             }
         }
+
         return retVal;
     }
 

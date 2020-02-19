@@ -53,7 +53,7 @@ public class AlarmUtil {
 
             } else {
                 // no repeat
-                if (curCal.after(minAlarmTimeCal)) {
+                if (curCal.before(minAlarmTimeCal)) {
                     retVal = onOrAfter;
                 }
             }
