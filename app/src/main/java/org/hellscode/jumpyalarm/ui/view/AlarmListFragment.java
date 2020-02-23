@@ -2,6 +2,7 @@ package org.hellscode.jumpyalarm.ui.view;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +28,7 @@ import org.hellscode.util.LoadWaitUtil;
 import org.hellscode.util.SimpleMethod;
 import org.hellscode.util.SimpleVoidMethod;
 import org.hellscode.util.ui.DialogUtil;
+import org.hellscode.util.ui.ErrorDialog;
 import org.hellscode.util.ui.view.DatePickerFragment;
 import org.hellscode.util.ui.view.TextEditFragment;
 import org.hellscode.util.ui.view.TimePickerFragment;
@@ -78,8 +80,10 @@ public class AlarmListFragment extends Fragment
         Activity activity = getActivity();
 
         if (activity == null) {
-            Log.e("AlarmListFragment", "Call to getActivity() returned null.");
-            System.exit(1);
+            ErrorDialog.handleUnrecoverableError(
+                    activity,
+                    "Call to getActivity() returned null.",
+                    null);
         } else {
 
             // load database
@@ -134,6 +138,15 @@ public class AlarmListFragment extends Fragment
         };
 
         vm.setUserSelectLabelAction(labelAction);
+
+        Runnable soundAction = new Runnable() {
+            @Override
+            public void run() {
+                onSoundClick(vm);
+            }
+        };
+
+        vm.setUserSelectSoundAction(soundAction);
 
         Runnable deleteAction = new Runnable() {
             @Override
@@ -297,7 +310,7 @@ public class AlarmListFragment extends Fragment
         // lookup id will be item ID in database
         int position = getItemPosById(lookupId);
 
-        if (lookupId >= 0) {
+        if (position >= 0) {
             AlarmViewModel vm = (AlarmViewModel)_listAdapter.getItem(position);
             if (vm != null) {
                 Calendar c = Calendar.getInstance();
@@ -343,12 +356,22 @@ public class AlarmListFragment extends Fragment
         // lookup id will be item ID in the database
         int position = getItemPosById(lookupId);
 
-        if (lookupId >= 0) {
+        if (position >= 0) {
             AlarmViewModel vm = (AlarmViewModel)_listAdapter.getItem(position);
             if (vm != null) {
                 vm.setLabel(text);
             }
         }
+    }
+
+    private void onSoundClick(@NonNull AlarmViewModel vm) {
+        long id = vm.getID();
+        String sound = vm.getSound();
+
+        Intent intent = new Intent(getContext(), SoundSelectionActivity.class);
+        intent.putExtra(SoundSelectionActivity.IntentConstants.ID, id);
+        intent.putExtra(SoundSelectionActivity.IntentConstants.SOUND, sound);
+        startActivityForResult(intent, 0);
     }
 
     private class AddClickListener implements View.OnClickListener {
@@ -391,4 +414,30 @@ public class AlarmListFragment extends Fragment
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(resultCode == 0) {
+            return;
+        }
+
+        long id = -1;
+        String sound = null;
+
+        if (data != null) {
+            id = data.getLongExtra(SoundSelectionActivity.IntentConstants.ID, -1);
+            sound = data.getStringExtra(SoundSelectionActivity.IntentConstants.SOUND);
+        }
+
+        // lookup id will be item ID in the database
+        int position = getItemPosById(id);
+
+        if (position >= 0) {
+            AlarmViewModel vm = (AlarmViewModel)_listAdapter.getItem(position);
+            if (vm != null) {
+                vm.setSound(sound);
+            }
+        }
+
+    }
 }

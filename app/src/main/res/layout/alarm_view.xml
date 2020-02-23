@@ -6,6 +6,7 @@
     <data>
         <import type="org.hellscode.jumpyalarm.ui.model.Converter"/>
         <import type="org.hellscode.jumpyalarm.ui.model.AlarmViewModel"/>
+        <import type="org.hellscode.jumpyalarm.util.SoundResolver"/>
         <variable name="viewModel" type="AlarmViewModel" />
     </data>
     <LinearLayout
@@ -151,6 +152,29 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginEnd="5dp"
                     android:layout_marginRight="5dp"
+                    android:text="@string/sound_label_text"/>
+                <com.google.android.material.button.MaterialButton
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="50sp"
+                    android:textAllCaps="false"
+                    android:gravity="start|center_vertical"
+                    android:text="@{SoundResolver.createSoundFromPath(viewModel.sound).displayName}"
+                    android:onClick="@{()->viewModel.runUserSelectSoundAction()}"
+                    android:enabled="@{viewModel.enabled}"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp"
                     android:text="@string/label_text"/>
                 <com.google.android.material.button.MaterialButton
                     style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -169,7 +193,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <com.google.android.material.textview.MaterialTextView
+            <TextView
                 android:id="@+id/nextAlarmDateText"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"

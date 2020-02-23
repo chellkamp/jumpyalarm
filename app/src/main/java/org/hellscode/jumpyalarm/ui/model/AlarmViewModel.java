@@ -9,6 +9,7 @@ import androidx.databinding.Bindable;
 import androidx.databinding.library.baseAdapters.BR;
 
 import org.hellscode.jumpyalarm.data.AlarmEntity;
+import org.hellscode.util.StringUtil;
 
 import java.util.Date;
 
@@ -40,6 +41,9 @@ public class AlarmViewModel extends BaseObservable {
     
     private Runnable _userSelectLabelAction;
     private final Object _userSelectLabelActionLock = new Object();
+
+    private Runnable _userSelectSoundAction;
+    private final Object _userSelectSoundActionLock = new Object();
 
     private Runnable _userDeleteAction;
     private final Object _userDeleteActionLock = new Object();
@@ -203,16 +207,10 @@ public class AlarmViewModel extends BaseObservable {
     }
 
     public void setLabel(String label) {
-        boolean changed = true;
+        boolean changed;
         synchronized (_memberLock) {
             String oldVal = _entity.getLabel();
-            if (oldVal != null && label != null) {
-                if (oldVal.equals(label)) {
-                    changed = false;
-                }
-            } else if (oldVal == null && label == null) {
-                changed = false;
-            }
+            changed = !StringUtil.areEqual(oldVal, label);
             if (changed) {
                 _entity.setLabel(label);
             }
@@ -220,6 +218,31 @@ public class AlarmViewModel extends BaseObservable {
 
         if (changed) {
             notifyPropertyChanged(BR.label);
+            saveToDB();
+        }
+    }
+
+    @Bindable
+    public String getSound() {
+        String retVal;
+        synchronized (_memberLock) {
+            retVal = _entity.getSound();
+        }
+        return retVal;
+    }
+
+    public void setSound(String sound) {
+        boolean changed;
+        synchronized (_memberLock) {
+            String oldVal = _entity.getSound();
+            changed = !StringUtil.areEqual(oldVal, sound);
+            if (changed) {
+                _entity.setSound(sound);
+            }
+        }
+
+        if (changed) {
+            notifyPropertyChanged(BR.sound);
             saveToDB();
         }
     }
@@ -277,6 +300,25 @@ public class AlarmViewModel extends BaseObservable {
         synchronized (_userSelectLabelActionLock) {
             if (_userSelectLabelAction != action) {
                 _userSelectLabelAction = action;
+            }
+        }
+    }
+
+    public void runUserSelectSoundAction() {
+        Runnable action;
+        synchronized (_userSelectSoundActionLock) {
+            action = _userSelectSoundAction;
+        }
+
+        if (action != null) {
+            action.run();
+        }
+    }
+
+    public void setUserSelectSoundAction(Runnable action) {
+        synchronized (_userSelectSoundActionLock) {
+            if (_userSelectSoundAction != action) {
+                _userSelectSoundAction = action;
             }
         }
     }

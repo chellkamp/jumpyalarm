@@ -74,8 +74,8 @@ public class TextEditFragment extends DialogFragment {
                 new MaterialAlertDialogBuilder(getActivity())
                 .setView(innerView)
                 .setCancelable(true)
-                .setPositiveButton(R.string.dialog_okay, posListener)
-                .setNegativeButton(R.string.dialog_cancel, null);
+                .setPositiveButton(android.R.string.ok, posListener)
+                .setNegativeButton(android.R.string.cancel, null);
 
         return builder.create();
     }

@@ -6,13 +6,14 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup"
         android:icon="@mipmap/logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:fullBackupContent="@xml/backup">
-
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".ui.view.SoundSelectionActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

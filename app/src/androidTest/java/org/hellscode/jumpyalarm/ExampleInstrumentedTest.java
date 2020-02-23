@@ -10,9 +10,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.hellscode.jumpyalarm.data.AlarmEntity;
 import org.hellscode.jumpyalarm.data.DatabaseHelper;
+import org.hellscode.jumpyalarm.util.BasicSound;
+import org.hellscode.jumpyalarm.util.SoundResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -79,8 +82,17 @@ public class ExampleInstrumentedTest {
             System.out.println(e.getOnOrAfter());
             System.out.println(e.getRepeat());
             System.out.println(e.getDaysOfWeek());
+            System.out.println(e.getSound());
         }
 
+    }
+
+    @Test
+    public void addSoundColumn() {
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        DatabaseHelper dbHelper = new DatabaseHelper(appContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.execSQL("ALTER TABLE \"Alarm\" ADD COLUMN \"Sound\" TEXT");
     }
 
     @Test
@@ -90,6 +102,34 @@ public class ExampleInstrumentedTest {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.execSQL("DROP TABLE \"Alarm\"");
 
+    }
+
+    @Test
+    public void basicSoundList() {
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        SoundResolver resolver = new SoundResolver(appContext);
+
+        BasicSound[] basicSounds = null;
+
+        try {
+            basicSounds = resolver.loadBasicSounds();
+        } catch(IOException ex) {
+            // do nothing here
+        }
+
+        assertNotNull(basicSounds);
+
+        assertTrue(basicSounds.length > 0);
+
+        for(BasicSound item : basicSounds) {
+            assertNotNull(item);
+            System.out.println(
+                    String.format("displayName: \"%s\", path: \"%s\"\n\tfor storage: \"%s\"",
+                            item.getDisplayName(),
+                            item.getPath(),
+                            item.getSoundPathForStorage())
+            );
+        }
     }
 
 }

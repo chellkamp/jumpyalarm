@@ -19,6 +19,7 @@ import org.hellscode.jumpyalarm.BR;
 import org.hellscode.jumpyalarm.R;
 import org.hellscode.jumpyalarm.databinding.AlarmViewBinding;
 import org.hellscode.jumpyalarm.ui.model.AlarmViewModel;
+import org.hellscode.util.ui.ErrorDialog;
 
 /**
  * AlarmView compound control
@@ -97,8 +98,10 @@ public class AlarmView extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (inflater == null) {
-            Log.e("AlarmView", "Call to inflater service returned null.");
-            System.exit(1);
+            ErrorDialog.handleUnrecoverableError(
+                    getContext(),
+                    "Call to inflater service returned null.",
+                     null);
         } else {
             _binding = DataBindingUtil.inflate(inflater, R.layout.alarm_view, this, true);
         }

@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Utility Library</string>
     <string name="enter_text_hint">Enter text</string>
-    <string name="dialog_okay">OK</string>
-    <string name="dialog_cancel">Cancel</string>
+    <string name="error">Error</string>
 </resources>

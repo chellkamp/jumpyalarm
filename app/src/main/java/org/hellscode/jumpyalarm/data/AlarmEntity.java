@@ -23,6 +23,7 @@ public class AlarmEntity {
         static final String Repeat = "Repeat";
         static final String DaysOfWeek = "DaysOfWeek";
         static final String Label = "Label";
+        static final String Sound = "Sound";
     }
 
     private static final String _table = "Alarm";
@@ -34,6 +35,7 @@ public class AlarmEntity {
     private boolean _field_Repeat;
     private byte _field_DaysOfWeek = 0b0111110;
     private String _field_Label;
+    private String _field_Sound;
 
     /**
      * Constructor
@@ -54,6 +56,7 @@ public class AlarmEntity {
             "  \"" + Columns.Repeat + "\" INTEGER NOT NULL,\n" +
             "  \"" + Columns.DaysOfWeek + "\" INTEGER NOT NULL,\n" +
             "  \"" + Columns.Label + "\" TEXT NULL\n" +
+            "  \"" + Columns.Sound + "\" TEXT NULL\n" +
             ")";
 
     public long get_id() { return _field__id; }
@@ -75,6 +78,9 @@ public class AlarmEntity {
 
     public String getLabel() { return _field_Label; }
     public void setLabel(String label) { _field_Label = label; }
+
+    public String getSound() { return _field_Sound; }
+    public void setSound(String sound) { _field_Sound = sound; }
 
     private long getNonNullDBValue(Date d) {
         long retVal = 0;
@@ -105,6 +111,7 @@ public class AlarmEntity {
         retVal.put(Columns.Repeat, _field_Repeat);
         retVal.put(Columns.DaysOfWeek, _field_DaysOfWeek);
         retVal.put(Columns.Label, _field_Label);
+        retVal.put(Columns.Sound, _field_Sound);
         return retVal;
     }
 
@@ -193,6 +200,7 @@ public class AlarmEntity {
         _field_Repeat = getBooleanFromDBValue(cursor.getInt(cursor.getColumnIndex(Columns.Repeat)));
         _field_DaysOfWeek = getByteFromDBValue(cursor.getInt(cursor.getColumnIndex(Columns.DaysOfWeek)));
         _field_Label = cursor.getString(cursor.getColumnIndex(Columns.Label));
+        _field_Sound = cursor.getString(cursor.getColumnIndex(Columns.Sound));
     }
 
     /**
