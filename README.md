@@ -8,8 +8,7 @@ I'm attempting to copy the alarm functionality off of my Android phone with the 
 Currently, this app does not actually trigger any sort of sound or notification.
 The initial focus is on getting enough of the GUI and SQLite database components up and running to drive the design and implementation of
 the job scheduling component that will schedule and trip the user-configured alarms.
-
-<img src="docimages/mainactivity.png" style="width:50%;border:5px solid black"/>
-<img src="docimages/timedialog.png" style="width:50%;border:5px solid black"/>
-<img src="docimages/calendardialog.png" style="width:50%;border:5px solid black"/>
-<img src="docimages/soundselectionactivity.png" style="width:50%;border:5px solid black"/>
+<img src="docimages/mainactivity.png" width="50%"/>
+<img src="docimages/timedialog.png" width="50%"/>
+<img src="docimages/calendardialog.png" width="50%"/>
+<img src="docimages/soundselectionactivity.png" width="50%"/>
